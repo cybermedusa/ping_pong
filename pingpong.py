@@ -18,11 +18,12 @@ play_again_img = pygame.image.load('play_again.jpeg').convert_alpha()
 
 
 class Ball:
-    def __init__(self, x, y, r):
+    def __init__(self, x, y, r, radius):
         self.x = x
         self.y = y
         self.r = r
         self.color = 'black'
+        self.radius = radius
 
     def draw(self):
         pygame.draw.circle(window_game, self.color, [self.x, self.y], self.r)
@@ -84,10 +85,13 @@ class Text:
 
 
 def game_init():
-    global ball
+    global ball, dx, dy
     global game_over
     ball.x, ball.y = window_width / 2, window_height / 2
+    dx = 1
+    dy = 0
     ball.x += dx
+    ball.y += dy
     game_over = False
 
 
@@ -99,7 +103,7 @@ def stop_game():
 
 player_score = Text('You: ', (100, 50))
 computer_score = Text('Computer: ', (1200, 50))
-ball = Ball(window_width / 2, window_height / 2, 10)
+ball = Ball(window_width / 2, window_height / 2, 10, 12)
 play_again_button = Button(window_width / 2, window_height / 2, play_again_img)
 
 # speed
@@ -129,25 +133,50 @@ while running:
     # right racket movement
     racket_right.y = ball.y - racket_right.h / 2
 
-    # todo change out_of_border conditions-?
-
-    if racket_right.y >= window_height - racket_right.h:
+    # right racket crossing lower border
+    if racket_right.y + (racket_right.h/2) >= window_height - racket_right.h/2:
         racket_right.y = window_height - racket_right.h
+
+    # right racket crossing upper border
+    if racket_right.y <= 0:
+        racket_right.y = 0
+
+    # left racket crossing upper border
+    if racket_left.y <= 0:
+        racket_left.y = 0
 
     if game_over:
         stop_game()
     else:
+        # print(ball.y)
         ball.x -= dx
         ball.y += dy
 
         hit_right_racket = ball.x == racket_right.x
         if hit_right_racket:
-            dx = dx * (-1)
+            x_direction = -1
+            distance = abs((racket_right.y + racket_right.h/2) - ball.y)
+            angle = math.pi/4 * distance
+            dx = x_direction * math.cos(angle)
+            dy = x_direction * math.sin(angle)
 
         # hit_left_racket
         if ball.x == racket_left.w and (ball.y >= racket_left.y and ball.y < racket_left.y + racket_left.h):
-            dx = dx * (-1)
-            dy = -0.7
+            x_direction = 1
+            if ball.y >= racket_left.y + racket_left.h/2:
+                distance = abs((racket_left.y + racket_left.h/2) - ball.y)
+                normalized_distance = distance/(racket_left.h/2)
+                print('ball.y: ' + str(round(ball.y)), 'middle of racket.y: ' + str(racket_left.y) + ' distance: ' + str(round(distance)))
+                angle = math.pi/4 * distance
+                dx = x_direction * math.cos(angle)
+                dy = x_direction * math.sin(angle)
+                print('dx: ' + str(dx), 'dy: ' + str(dy), 'angle: ' + str(angle))
+            elif ball.y <= racket_left.y + racket_left.h/2:
+                distance = abs((racket_left.y + racket_left.h / 2) - ball.y) * (-1)
+                normalized_distance = distance / (racket_left.h / 2)
+                angle = math.pi / 4 * distance
+                dx = x_direction * math.cos(angle)
+                dy = x_direction * math.sin(angle)
 
         upper_edge_crossed = ball.y < 0
         if upper_edge_crossed:
@@ -157,13 +186,13 @@ while running:
         if lower_edge_crossed:
             dy = dy * (-1)
 
-        out_of_border_left_side = ball.x <= 0
-        if out_of_border_left_side:
+        left_edge_crossed = ball.x <= 0
+        if left_edge_crossed:
             stop_game()
             c_score += 1
 
-        out_of_border_right_side = ball.x >= window_width
-        if out_of_border_right_side:
+        right_edge_crossed = ball.x >= window_width
+        if right_edge_crossed:
             stop_game()
             p_score += 1
 
