@@ -1,6 +1,4 @@
 import pygame
-import math
-import random
 
 pygame.init()
 
@@ -9,6 +7,7 @@ window_height = 700
 game_over = False
 p_score = 0
 c_score = 0
+speed = 0
 
 window_game = pygame.display.set_mode((window_width, window_height))
 
@@ -102,29 +101,23 @@ def stop_game():
 
 def count_dy_after_hit():
     global dy
-    distance = round(abs((racket_left.y + racket_left.h / 2) - ball.y))
-    dy = distance * 1/40
-    hit_point_condition = dy if ball.y > racket_left.y + racket_left.h/2 else dy*(-1)
-    return hit_point_condition
-    # if ball.y > racket_left.y + racket_left.h / 2:
-    #     y_velocity =
-    # if ball.y < racket_left.y + racket_left.h / 2:
-    #     y_velocity =
-
-
+    distance = round((racket_left.y + racket_left.h / 2) - ball.y)
+    angle = distance * 1 / 40
+    dy = angle * (-1) if distance < 0 else angle * (-1)
+    return dy
 
 
 player_score = Text('You: ', (100, 50))
 computer_score = Text('Computer: ', (1200, 50))
+
 ball = Ball(window_width / 2, window_height / 2, 10)
 play_again_button = Button(window_width / 2, window_height / 2, play_again_img)
 
-# speed
-dx = 1
-dy = 0
-
 racket_left = Racket(0, window_height / 2, 20, 80)
 racket_right = Racket(int(window_width - 20), int(window_height / 2), 20, 80)
+
+dx = 1
+dy = 0
 
 running = True
 while running:
@@ -140,7 +133,7 @@ while running:
             mouse_position = pygame.mouse.get_pos()
             racket_left.y = mouse_position[1] - racket_left.h / 2
 
-            if mouse_position[1] >= window_height - 80:
+            if mouse_position[1] >= window_height - racket_left.h/2:
                 racket_left.y = window_height - 80
 
     # right racket movement
@@ -168,28 +161,10 @@ while running:
         if hit_right_racket:
             dx = dx * (-1)
 
-        # for i in zip_list:
-        #     if i[0] == distance:
-        #         dy = i[1]
-        #         print(i[1])
-
         # hit_left_racket
         if ball.x == racket_left.w and (ball.y >= racket_left.y and ball.y < racket_left.y + racket_left.h):
-            # distance = round(abs((racket_left.y + racket_left.h / 2) - ball.y))
             dx = dx * (-1)
             count_dy_after_hit()
-            # if ball.y > racket_left.y + racket_left.h / 2:
-            #     dy = angles[distance]
-            # if ball.y < racket_left.y + racket_left.h / 2:
-            #     dy = -angles[distance]
-            # for i in zip_list:
-            #     if i[0] == distance:
-
-            #         if distance == 0:
-            #             dy = 0
-            #         print(distance, i[1])
-
-            # if ball.y >= racket_left.y + racket_left.h/2:
 
         upper_edge_crossed = ball.y < 0
         if upper_edge_crossed:
@@ -213,7 +188,7 @@ while running:
 
     racket_left.draw()
     racket_right.draw()
-    pygame.draw.line(window_game, 'black', (window_width / 2, 0), (window_width / 2, window_height))
+    pygame.draw.line(window_game, 'black', (window_width / 2, 0), (window_width / 2, window_height), width=1)
     player_score.show_player()
     computer_score.show_computer()
     pygame.display.flip()
