@@ -17,12 +17,11 @@ play_again_img = pygame.image.load('play_again.jpeg').convert_alpha()
 
 
 class Ball:
-    def __init__(self, x, y, r, radius):
+    def __init__(self, x, y, r):
         self.x = x
         self.y = y
         self.r = r
         self.color = 'black'
-        self.radius = radius
 
     def draw(self):
         pygame.draw.circle(window_game, self.color, [self.x, self.y], self.r)
@@ -103,8 +102,8 @@ def stop_game():
 def count_dy_after_hit():
     global dy
     distance = round((racket_left.y + racket_left.h / 2) - ball.y)
-    angle = distance * 1 / 40
-    dy = angle * (-1) if distance < 0 else angle * (-1)
+    angle = (distance * 1 / 40) * -1
+    dy = angle
     return dy
 
 
@@ -155,17 +154,12 @@ while running:
     if game_over:
         stop_game()
     else:
-        # print(ball.y)
         ball.x -= dx
         ball.y += dy
 
         hit_right_racket = ball.x == racket_right.x
         if hit_right_racket:
-            x_direction = -1
-            distance = abs((racket_right.y + racket_right.h/2) - ball.y)
-            angle = math.pi/4 * distance
-            dx = x_direction * math.cos(angle)
-            dy = x_direction * math.sin(angle)
+            dx = dx * (-1)
 
         # hit_left_racket
         if ball.x == racket_left.w and (ball.y >= racket_left.y and ball.y < racket_left.y + racket_left.h):
