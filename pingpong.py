@@ -84,10 +84,13 @@ class Text:
 
 
 def game_init():
-    global ball
+    global ball, dx, dy
     global game_over
     ball.x, ball.y = window_width / 2, window_height / 2
+    dx = 1
+    dy = 0
     ball.x += dx
+    ball.y += dy
     game_over = False
 
 
@@ -95,6 +98,20 @@ def stop_game():
     global game_over
     game_over = True
     play_again_button.draw()
+
+
+def count_dy_after_hit():
+    global dy
+    distance = round(abs((racket_left.y + racket_left.h / 2) - ball.y))
+    dy = distance * 1/40
+    hit_point_condition = dy if ball.y > racket_left.y + racket_left.h/2 else dy*(-1)
+    return hit_point_condition
+    # if ball.y > racket_left.y + racket_left.h / 2:
+    #     y_velocity =
+    # if ball.y < racket_left.y + racket_left.h / 2:
+    #     y_velocity =
+
+
 
 
 player_score = Text('You: ', (100, 50))
@@ -129,10 +146,17 @@ while running:
     # right racket movement
     racket_right.y = ball.y - racket_right.h / 2
 
-    # todo change out_of_border conditions-?
-
-    if racket_right.y >= window_height - racket_right.h:
+    # right racket crossing lower border
+    if racket_right.y + (racket_right.h / 2) >= window_height - racket_right.h / 2:
         racket_right.y = window_height - racket_right.h
+
+    # right racket crossing upper border
+    if racket_right.y <= 0:
+        racket_right.y = 0
+
+    # left racket crossing upper border
+    if racket_left.y <= 0:
+        racket_left.y = 0
 
     if game_over:
         stop_game()
@@ -144,10 +168,28 @@ while running:
         if hit_right_racket:
             dx = dx * (-1)
 
+        # for i in zip_list:
+        #     if i[0] == distance:
+        #         dy = i[1]
+        #         print(i[1])
+
         # hit_left_racket
         if ball.x == racket_left.w and (ball.y >= racket_left.y and ball.y < racket_left.y + racket_left.h):
+            # distance = round(abs((racket_left.y + racket_left.h / 2) - ball.y))
             dx = dx * (-1)
-            dy = -0.7
+            count_dy_after_hit()
+            # if ball.y > racket_left.y + racket_left.h / 2:
+            #     dy = angles[distance]
+            # if ball.y < racket_left.y + racket_left.h / 2:
+            #     dy = -angles[distance]
+            # for i in zip_list:
+            #     if i[0] == distance:
+
+            #         if distance == 0:
+            #             dy = 0
+            #         print(distance, i[1])
+
+            # if ball.y >= racket_left.y + racket_left.h/2:
 
         upper_edge_crossed = ball.y < 0
         if upper_edge_crossed:
@@ -157,13 +199,13 @@ while running:
         if lower_edge_crossed:
             dy = dy * (-1)
 
-        out_of_border_left_side = ball.x <= 0
-        if out_of_border_left_side:
+        left_edge_crossed = ball.x <= 0
+        if left_edge_crossed:
             stop_game()
             c_score += 1
 
-        out_of_border_right_side = ball.x >= window_width
-        if out_of_border_right_side:
+        right_edge_crossed = ball.x >= window_width
+        if right_edge_crossed:
             stop_game()
             p_score += 1
 
