@@ -21,7 +21,7 @@ class Ball:
         self.x = x
         self.y = y
         self.r = r
-        self.color = 'black'
+        self.color = '#823FF3'
 
     def draw(self):
         pygame.draw.circle(window_game, self.color, [self.x, self.y], self.r)
