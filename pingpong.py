@@ -2,8 +2,8 @@ import pygame
 
 pygame.init()
 
-window_width = 1400
-window_height = 700
+window_width = 600
+window_height = 420
 game_over = False
 p_score = 0
 c_score = 0
@@ -62,7 +62,7 @@ class Button:
 class Text:
     def __init__(self, text, coordinates):
         self.name = 'freesansbold.ttf'
-        self.size = 30
+        self.size = 20
         self.text = text
         self.color = 'black'
         self.coordinates = coordinates
@@ -84,10 +84,11 @@ class Text:
 
 def game_init():
     global ball, dx, dy
-    global game_over
+    global game_over, speed
     ball.x, ball.y = window_width / 2, window_height / 2
     dx = 1
     dy = 0
+    speed = 0
     ball.x += dx
     ball.y += dy
     game_over = False
@@ -108,13 +109,13 @@ def count_dy_after_hit():
 
 
 player_score = Text('You: ', (100, 50))
-computer_score = Text('Computer: ', (1200, 50))
+computer_score = Text('Computer: ', (500, 50))
 
-ball = Ball(window_width / 2, window_height / 2, 10)
+ball = Ball(window_width / 2, window_height / 2, 8)
 play_again_button = Button(window_width / 2, window_height / 2, play_again_img)
 
-racket_left = Racket(0, window_height / 2, 20, 80)
-racket_right = Racket(int(window_width - 20), int(window_height / 2), 20, 80)
+racket_left = Racket(0, window_height / 2, 10, 45)
+racket_right = Racket(int(window_width - 10), int(window_height / 2), 10, 45)
 
 dx = 1
 dy = 0
@@ -188,7 +189,7 @@ while running:
 
     racket_left.draw()
     racket_right.draw()
-    pygame.draw.line(window_game, 'black', (window_width / 2, 0), (window_width / 2, window_height), width=1)
+    pygame.draw.line(window_game, 'grey', (window_width / 2, 0), (window_width / 2, window_height), width=1)
     player_score.show_player()
     computer_score.show_computer()
     pygame.display.flip()
